@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Teste upload</title>
+    </head>
+    <body>
+        <h1>upload!</h1>
+        <form id="upload-form" action="" method="POST" enctype="multipart/form-data">
+                <input type="file" id="file" name="file" name="submit">
+                <input type="submit" value="Upload image">
+        </form>
+
+        <div id="gallery">
+             
+        </div>
+
+        <script type="text/javascript">
+            const CLIENT_ID ="0f6ee2b06618621";
+            const gallery = document.getElementById('gallery');
+             const doUpload = (url, options) =>{
+                 const promiseCallback = (resolve, reject) =>{
+                    fetch(url, options)
+                    .then(response => response.json())
+                    .then(resolve)
+                    .catch(reject);
+                 };
+                 return new Promise (promiseCallback);
+             } 
+             const addImage = (url) =>{
+                
+                gallery.innerHTML = `<img src="${url}" width="150" />`;
+             }
+             const onSuccess = (result) => {
+                 const {data: {link} } = result;
+                 console.log('link', link);
+
+                 addImage(link);
+             };
+
+             const uploadImage = (e) => {
+                 e.preventDefault();//nao faz submit
+                 const file = document.getElementById('file');
+                 //pegar o arquivo submetido com dat
+                 const data = new FormData();//
+                 data.append('image', file.files[0]);
+
+                 //fazer o upload.
+                doUpload('https://api.imgur.com/3/image',{
+                    method: 'POST',
+                    body: data,
+                    headers: {
+                        'Authorization':`Client-ID ${CLIENT_ID}`,
+                    }
+                })
+                .then(onSuccess)
+                .catch(console.error);
+             };   
+            
+            const form = document.getElementById('upload-form');//pegando o form pelo ID
+                form.addEventListener('submit',uploadImage)//  
+                
+        </script>
+    </body>
+</html>
